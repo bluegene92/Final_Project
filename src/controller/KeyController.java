@@ -2,6 +2,7 @@ package controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import model.Asteroid;
 import model.GameFigure;
 import model.Missile;
 import model.Spaceship;
@@ -24,6 +25,11 @@ public class KeyController extends KeyAdapter {
                 Star s = (Star) f;
                 s.boosterOn();
             }
+            
+            for (GameFigure a : Main.gameData.enemyFigures) {
+                Asteroid asteroid = (Asteroid) a;
+                asteroid.speedUp();
+            }
         }
     }
     
@@ -36,6 +42,11 @@ public class KeyController extends KeyAdapter {
                 Star s = (Star) f;
                 s.boosterOff();
             }
+            for (GameFigure a : Main.gameData.enemyFigures) {
+                Asteroid asteroid = (Asteroid) a;
+                asteroid.speedDown();
+            }
+            
         } else if (code == KeyEvent.VK_M) {
             Main.gameData.friendFigures.add(new Missile(
                 spaceship.x + 64,

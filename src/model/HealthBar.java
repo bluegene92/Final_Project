@@ -1,6 +1,7 @@
 
 package model;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
@@ -31,9 +32,10 @@ public class HealthBar extends GameFigure {
         }
         
         for (int i = 0; i < 6; ++i) {
-            healthBarSprites.add(image.getSubimage(0, i*120, 450, 120));
+            BufferedImage tmp = resize(image.getSubimage(0, i*120, 450, 120), 450/6, 120/6);
+            healthBarSprites.add(tmp);
         }
-        healthBarImage = resize(healthBarSprites.get(0), 450/6, 120/6);
+        healthBarImage = healthBarSprites.get(0);
     }
     
     
@@ -67,7 +69,15 @@ public class HealthBar extends GameFigure {
             healthBarImage = healthBarSprites.get(0);
         } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_4) {
             healthBarImage = healthBarSprites.get(1);
-        }
+        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_3) {
+            healthBarImage = healthBarSprites.get(2);
+        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_2) {
+            healthBarImage = healthBarSprites.get(3);
+        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_1) {
+            healthBarImage = healthBarSprites.get(4);
+        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_0) {
+            healthBarImage = healthBarSprites.get(5);
+        } 
         
     }
 

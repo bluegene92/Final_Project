@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import view.PlayAgainButton;
+import view.StartButton;
 
 public class GameData {
 
@@ -16,19 +18,43 @@ public class GameData {
     public final List<GameFigure> stars;
     public static Spaceship spaceship;
     public HealthBar healthBar;
+    public Score scoreBoard;
+    public StartButton startButton;
+    public PlayAgainButton playAgainButton;
+    public int asteroidCount = 0;
+    private Random rand = new Random();
+    
     
     public GameData() {
         enemyFigures = new CopyOnWriteArrayList<>();
         friendFigures = new CopyOnWriteArrayList<>();
         stars = new CopyOnWriteArrayList<>();
         healthBar = new HealthBar(50, 50);
+        scoreBoard = new Score();
+        
+        startButton = new StartButton();
+        playAgainButton = new PlayAgainButton();
+        
         // GamePanel.width, height are known when rendered. 
         // Thus, at this moment,
         // we cannot use GamePanel.width and height.
         spaceship = new Spaceship(30, Main.WIN_HEIGHT / 2);
         addStars();
+        addAsteroid();
         friendFigures.add(spaceship);
-        
+    }
+    
+    public void addAsteroid() {
+        for (int i = 0; i < 2; ++i) {
+            int rx = rand.nextInt((Main.WIN_WIDTH + 2000) 
+            - (Main.WIN_WIDTH +50) + 1) + Main.WIN_WIDTH + 50;
+
+            int ry = rand.nextInt(Main.WIN_HEIGHT);
+            float speed = 1 + rand.nextFloat() * (6 - 1);
+
+            enemyFigures.add(new Asteroid(rx, ry, speed));
+            asteroidCount++;
+        }
     }
 
     public void addStars() {
@@ -41,34 +67,10 @@ public class GameData {
                 stars.add(new Star(rx, ry, speed, size));
         }
     }
+
     
-    public void add(int n) {
-        for (int i = 0; i < n; i++) {
-            float red = (float) Math.random();
-            float green = (float) Math.random();
-            float blue = (float) Math.random();
-            // adjust if too dark since the background is black
-            if (red < 0.5) {
-                red += 0.2;
-            }
-            if (green < 0.5) {
-                green += 0.2;
-            }
-            if (blue < 0.5) {
-                blue += 0.2;
-            }
-            enemyFigures.add(new Bomb(
-                    (int) (Math.random() * GamePanel.width),
-                    (int) (Math.random() * GamePanel.height),
-                    RADIUS,
-                    new Color(red, green, blue)));
-        }
-    }
-
     public void update() {
-
         healthBar.update();
-
         for (GameFigure star : stars) {
             star.update();
         }

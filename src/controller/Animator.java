@@ -7,7 +7,8 @@ public class Animator implements Runnable {
 
     public boolean running = true;
     private final int FRAMES_PER_SECOND = 60;
-
+    public boolean gameStart = false;
+    
     @Override
     public void run() {
 
@@ -15,8 +16,9 @@ public class Animator implements Runnable {
             long startTime = System.currentTimeMillis();
             
             processCollisions();
-
-            Main.gameData.update();
+            if (gameStart) {
+                Main.gameData.update();
+            }
             Main.gamePanel.gameRender();
             Main.gamePanel.printScreen();
 

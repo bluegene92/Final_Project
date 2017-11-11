@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.geom.Ellipse2D;
 import javax.swing.JPanel;
 import model.GameFigure;
 
@@ -19,7 +18,7 @@ public class GamePanel extends JPanel {
     // off screen rendering
     private Graphics2D g2;
     private Image dbImage = null; // double buffer image
-
+    
     public void gameRender() {
         width = getSize().width;
         height = getSize().height;
@@ -40,6 +39,9 @@ public class GamePanel extends JPanel {
         if (Main.animator.running) {
             
             Main.gameData.healthBar.render(g2);
+            Main.gameData.scoreBoard.draw(g2);
+            Main.gameData.startButton.draw(g2);
+            Main.gameData.playAgainButton.draw(g2);
             
             for (GameFigure f : Main.gameData.stars) {
                 f.render(g2);

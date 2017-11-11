@@ -1,10 +1,14 @@
-package controller;
 
+package controller;
 import javax.swing.JFrame;
 import model.GameData;
 import view.GamePanel;
 import view.MainWindow;
 
+/**
+ * Version: 1.1
+ * @author dattr
+ */
 public class Main {
 
     public static GamePanel gamePanel;
@@ -15,11 +19,13 @@ public class Main {
     public static int WIN_HEIGHT = 600;
 
     public static void main(String[] args) {
-
+        
         
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
+            
+            
         animator = new Animator();
         gameData = new GameData();
         gamePanel = new GamePanel();
