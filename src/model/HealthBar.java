@@ -47,7 +47,7 @@ public class HealthBar extends GameFigure {
 
     @Override
     public void render(Graphics2D g) {
-        g.drawImage(healthBarImage, 50, 50, null);
+        g.drawImage(healthBarImage, 30, 30, null);
     }
 
     

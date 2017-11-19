@@ -8,71 +8,82 @@ package model;
 
 import controller.Main;
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 public class Asteroid extends GameFigure {
 
-    BufferedImage image;
-    private List<BufferedImage> asteroidImageList = new ArrayList<>();
+    private BufferedImage asteroidImage;
     private float xSpeed = 3;
     private Random rand = new Random();
-    private BufferedImage scaledImage;
-    private BufferedImage choosenAsteroid;
     private boolean speedFlag = false;
     public static int count = 0;
     private final int MAX = 5;
     private AffineTransform transformer = new AffineTransform();
     private double angle = 360;
-    private int w, h;
+    public float width, height;
     private double offset = 0.5; // Speed of rotation
     private float rotateDirection = 0.0f;
+    public int asteroidHealth;
+    private int asteroidType;
+    public float dx = 0.0f;
+    public float dy = 0.0f;
+    private int size = 1;
+    public boolean breakOff = false;
     
-    public Asteroid(float x, float y, float speed) {
+    public Asteroid(BufferedImage sprite, float x, float y, int size, int type) {
         super(x, y);
-        this.xSpeed = speed;
+        asteroidHealth = (6-size) * 2;
+        //float random = min + r.nextFloat() * (max - min);
+        xSpeed = 1 + rand.nextFloat() * (8 - 1);
+        asteroidType = type;
         rotateDirection = (float) Math.random();
-        try {
-            image = ImageIO.read(getClass().getResource("asteroid_sprite.png"));
-            
-            for (int i = 0; i < 2; ++i) {
-                for (int j = 0; j < 2; ++j) {
-                    int scale = rand.nextInt(4 - 1 + 1) + 1;
-                    scaledImage = resize(image.getSubimage(i*128, j*128, 128, 128), 128/scale, 128/scale);
-                    asteroidImageList.add(scaledImage);
-                }
-            }
-            
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Error: Cannot open spaceship.png");
-            System.exit(-1);
-        }
-        
-        int v = rand.nextInt(4);
-        choosenAsteroid = asteroidImageList.get(v);
-        w = choosenAsteroid.getWidth();
-        h = choosenAsteroid.getHeight();
+        asteroidImage = resize(sprite, 128/size, 128/size);
+        width = asteroidImage.getWidth();
+        height = asteroidImage.getHeight();
+        this.size = size;
+        setState(new ActiveState());
+        System.out.println(myState.toString());
+        System.out.println("health: " + asteroidHealth);
     }
+    
+    
+    public Asteroid(BufferedImage sprite, float sx, float sy, float tx, float ty, int size, int type) {
+        super(sx, sy);
+        breakOff = true; //Make the asteroid split up randomly
+        double angle = Math.atan2(ty-sy, tx-sx);
+        xSpeed =  rand.nextInt(4) + 1;
+        dx = (float) (xSpeed * Math.cos(angle));
+        dy = (float) (xSpeed * Math.sin(angle));
+        System.out.println(dx + " " + dy);
+        asteroidHealth = (6-size) * 2;
+        asteroidImage = resize(sprite, 128/size, 128/size);
+        width = asteroidImage.getWidth();
+        height = asteroidImage.getHeight();
+        this.size = size;
+        setState(new ActiveState());
+        System.out.println("break off");
+    }
+
     
     @Override
     public void render(Graphics2D g) {
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        int v = rand.nextInt(4);
-        
-        //transformer.setToTranslation(choosenAsteroid.getWidth()/2, choosenAsteroid.getHeight()/2);
-        transformer.setToTranslation(super.x, super.y);
-        transformer.rotate(Math.toRadians(angle), w/2, h/2);
+        int v = rand.nextInt(4);        
+        if (!breakOff) {
+            transformer.setToTranslation(super.x, super.y);
+        } else {
+            transformer.setToTranslation(super.x += dx, super.y += dy);
+        }
+        transformer.rotate(Math.toRadians(angle), width/2, height/2);
         //g.drawImage(choosenAsteroid, (int)super.x, (int)super.y, null);
-        g.drawImage(choosenAsteroid, transformer, null);
+        g.drawImage(asteroidImage, transformer, null);
+        //g.draw(new Rectangle.Float(super.x + (width/10), super.y + height/10, (float) width*0.8f, (float) height*0.8f));
+
     }
 
     public void rotateCounterClockwise() {
@@ -89,7 +100,6 @@ public class Asteroid extends GameFigure {
         }
     }
     
-    
     @Override
     public void update() {
         
@@ -102,12 +112,14 @@ public class Asteroid extends GameFigure {
         if (speedFlag) {
             super.x-=xSpeed*1.8;
         } else {
-            super.x-=xSpeed;
+            if (!breakOff) {
+                super.x -= xSpeed;
+            }
         }
-                
-        System.out.println("X: " + super.x);
+        
+
+
         if (super.x <= -200) {
-            System.out.println("reset asteroid to the right");
             rotateDirection = (float) Math.random();
             super.x = Main.WIN_WIDTH + 200;
             super.y = rand.nextInt(Main.WIN_HEIGHT);
@@ -122,20 +134,9 @@ public class Asteroid extends GameFigure {
         speedFlag = false;
     }
 
-    public static BufferedImage resize(BufferedImage img, int newW, int newH) {
-        Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = dimg.createGraphics();
-        g.drawImage(tmp, 0, 0, null);
-        g.dispose();
-    return dimg;    
-    }
-
-    
     @Override
     public Rectangle2D getCollisionBox() {
-        return new Rectangle2D.Float(super.x, (int) super.y,
-                20 , 20);
+        return new Rectangle.Float(super.x + (width/10), super.y + height/10, (float) width*0.8f, (float) height*0.8f);
     }
 
 }

@@ -3,23 +3,46 @@ package controller;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import model.Bullet;
+import model.GameFigure;
+import model.Hit;
 import model.Missile;
+import model.Score;
 import model.Spaceship;
 
 public class MouseController extends MouseAdapter {
     
     public static int x;
     public static int y;
-
     volatile private boolean mouseDown = false;
+    Spaceship spaceship = (Spaceship) Main.gameData.friendFigures.get(0);
+    
+    public MouseController() {
+        enableMissile();
+    }
+    
+    public void enableMissile() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                if (spaceship.missileCharge < 5) {
+                    spaceship.missileCharge++;
+                    System.out.println("charging: " + spaceship.missileCharge);
+                }
+                
+                if (spaceship.missileCharge >= 5) {
+                    Main.gameData.scoreBoard.missileSprite = Score.missile;
+                }
+            }
+        }, 0, 1000);
+    }
     
     
     @Override
     public void mousePressed(MouseEvent me) {
-        
-        Spaceship spaceship = (Spaceship) Main.gameData.friendFigures.get(0);
         int px = x;
         int py = y;
         
@@ -38,29 +61,26 @@ public class MouseController extends MouseAdapter {
             
             
             
-            Bullet m = new Bullet(
+            Bullet bullet = new Bullet(
                 spaceship.x + 64,
                 spaceship.y + (29 / 2),
-                px, py, // target location where the missile explodes
+                px, py,
                 Color.YELLOW);
             
             // Shoot only if the game started
             if (Main.animator.gameStart) {
-                Main.gameData.friendFigures.add(m);
+                Main.gameData.friendFigures.add(bullet);
             }
         } else if (SwingUtilities.isRightMouseButton(me)) {
-            System.out.println("right click");
-//            Missile mi = new Missile(
-//                spaceship.x + 64,
-//                spaceship.y + (29 / 2),
-//                px, py);
-
             // Shoot only if the game started
-            if (Main.animator.gameStart) {
-                Main.gameData.friendFigures.add(new Missile(
+            if (Main.animator.gameStart && spaceship.missileCharge >= 5) {
+                Missile missile = new Missile(
                     spaceship.x + 64,
                     spaceship.y + (29 / 2),
-                    px, py));
+                    px, py);
+                Main.gameData.friendFigures.add(missile);
+                spaceship.missileCharge = 0;
+                Main.gameData.scoreBoard.missileSprite = null;
             }
         }
     }
@@ -74,7 +94,11 @@ public class MouseController extends MouseAdapter {
         double dx = x - spaceship.x;
         double dy = y - spaceship.y - 10;
         spaceship.imageAngleRad = Math.atan2(dy, dx);
-        
+        if (spaceship.boosterFlag) {
+            spaceship.dy = 4;
+        } else {
+            spaceship.dy = 3;
+        }
         
         // If the game haven't started, allow mouse to hover over start menu
         if (!Main.animator.gameStart) {

@@ -23,21 +23,14 @@ public class Missile extends GameFigure {
     // public properties for quick access
     public Color color;
     public Point2D.Float target;
-
     private BufferedImage image;
     private List<BufferedImage> missileSprites;
     private int size = SIZE;
     private float xSpeed = 2;
     private BufferedImage smallMissile;
-    
-    /**
-     *
-     * @param sx start x of the missile
-     * @param sy start y of the missile
-     * @param tx target x of the missile
-     * @param ty target y of the missile
-     * @param color color of the missile
-     */
+    private int width;
+    private int height;
+    public State myState = new ActiveState();
     public Missile(float sx, float sy, float tx, float ty) {
         super(sx, sy);
         super.state = GameFigureState.MISSILE_STATE_LAUNCHED;
@@ -56,23 +49,27 @@ public class Missile extends GameFigure {
             }
         }
         smallMissile = resize(missileSprites.get(1), 350 / 8, 80 / 8);
+        width = smallMissile.getWidth();
+        height = smallMissile.getHeight();
+    }
+    
+    @Override
+    public void setState(State s) {
+        myState = s;
     }
 
     @Override
     public void render(Graphics2D g) {
         g.drawImage(smallMissile, (int) super.x, (int) super.y, null);
+//        g.draw(new Rectangle2D.Float(
+//                (int) (super.x),
+//                (int) (super.y),
+//                width, height));
     }
 
     @Override
     public void update() {
-        updateState();
-        if (state == GameFigureState.MISSILE_STATE_LAUNCHED) {
-            updateLocation();
-        } else if (state == GameFigureState.MISSILE_STATE_EXPLODED) {
-           //Explosion animation
-            
-            
-        }
+        myState.doAction(this);
     }
 
     
@@ -91,25 +88,18 @@ public class Missile extends GameFigure {
     }
 
     public void updateState() {
-        if (state == GameFigureState.MISSILE_STATE_LAUNCHED) {
-            if (super.x > Main.WIN_WIDTH + 10) {
-                state = GameFigureState.STATE_DONE;
-            }
-        } else if (state == GameFigureState.MISSILE_STATE_EXPLODED) {
-      
-            //draw explosion at the missle location
-            
-            
-            
+        if (super.x > Main.WIN_WIDTH + 10) {
+            setState(new DoneState());
         }
     }
+   
     
     @Override
     public Rectangle2D getCollisionBox() {
         return new Rectangle2D.Float(
-                (int) (super.x - size / 2),
-                (int) (super.y - size / 2),
-                (float) size * 0.9f, (float) size * 0.9f);
+                (int) (super.x),
+                (int) (super.y),
+                width, height);
     }
 
 }

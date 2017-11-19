@@ -2,7 +2,6 @@ package model;
 
 import controller.Main;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -19,12 +18,13 @@ public class Spaceship extends GameFigure {
     private final int UNIT_TRAVEL = 2; // per frame
     private float mouseX;
     private float mouseY;
-    private int dy = 3;
+    public int dy = 3;
     private BufferedImage image;
     private List<BufferedImage> spaceshipSprites;
     private int frameNumber = 0;
     public static double imageAngleRad = 0;
-    private boolean boosterFlag = false;
+    public boolean boosterFlag = false;
+    public int missileCharge;
     
     private int direction = 1; // +1: to the right; -1 to the left
 
@@ -32,6 +32,8 @@ public class Spaceship extends GameFigure {
         super(x, y); // origin: upper-left corner
         super.state = GameFigureState.SPACESHIP_STATE_APPEARED;
         super.state = GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_5;
+        missileCharge = 5;
+        setState(new ActiveState());
         try {
             image = ImageIO.read(getClass().getResource("f1.png"));
         } catch (IOException ex) {

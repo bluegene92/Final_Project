@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 import view.PlayAgainButton;
 import view.StartButton;
@@ -22,39 +24,28 @@ public class GameData {
     public StartButton startButton;
     public PlayAgainButton playAgainButton;
     public int asteroidCount = 0;
-    private Random rand = new Random();
-    
-    
+    public AsteroidFactory asteroidFactory;
+    public final List<GameFigure> removeFigures;
     public GameData() {
         enemyFigures = new CopyOnWriteArrayList<>();
         friendFigures = new CopyOnWriteArrayList<>();
+        removeFigures = new CopyOnWriteArrayList<>();
         stars = new CopyOnWriteArrayList<>();
         healthBar = new HealthBar(50, 50);
-        scoreBoard = new Score();
-        
+        asteroidFactory = new AsteroidFactory();
         startButton = new StartButton();
         playAgainButton = new PlayAgainButton();
-        
-        // GamePanel.width, height are known when rendered. 
-        // Thus, at this moment,
-        // we cannot use GamePanel.width and height.
+
         spaceship = new Spaceship(30, Main.WIN_HEIGHT / 2);
-        addStars();
-        addAsteroid();
         friendFigures.add(spaceship);
+        scoreBoard = new Score();
+        addStars();
+        removeHit();
     }
     
     public void addAsteroid() {
-        for (int i = 0; i < 2; ++i) {
-            int rx = rand.nextInt((Main.WIN_WIDTH + 2000) 
-            - (Main.WIN_WIDTH +50) + 1) + Main.WIN_WIDTH + 50;
-
-            int ry = rand.nextInt(Main.WIN_HEIGHT);
-            float speed = 1 + rand.nextFloat() * (6 - 1);
-
-            enemyFigures.add(new Asteroid(rx, ry, speed));
-            asteroidCount++;
-        }
+        enemyFigures.add(asteroidFactory.getAsteroid());
+        System.out.println("adding asteroid");
     }
 
     public void addStars() {
@@ -68,53 +59,64 @@ public class GameData {
         }
     }
 
+    public void removeHit() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                for (int i = 0; i < friendFigures.size(); i++) {
+                    GameFigure ff = friendFigures.get(i);
+                    if (ff instanceof Hit) {
+                        friendFigures.remove(i);
+                    }
+                }
+            }
+        }, 0, 300);
+    }
     
     public void update() {
         healthBar.update();
         for (GameFigure star : stars) {
             star.update();
         }
+
         
         for (GameFigure g : friendFigures) {
             g.update();
         }
         
-        // no enemy is removed in the program
-        // since collision detection is not implemented yet.
-        // However, if collision detected, simply set
-        // f.state = GameFigure.STATE_DONE
-        ArrayList<GameFigure> removeEnemies = new ArrayList<>();
         GameFigure f;
-        
-        
-        
-        for (int i = 0; i < enemyFigures.size(); i++) {
-            f = enemyFigures.get(i);
-            if (f.state == GameFigureState.STATE_DONE && f.y > Main.WIN_HEIGHT - 80) {
-                removeEnemies.add(f);
-            }
-            
-            /**
-             * If the bomb state is done and its size shrink below 0, remove it
-             */
-            else if (f.state == GameFigureState.STATE_DONE && f.size < 0) {
-                //System.out.println("remove this bomb!");
-                enemyFigures.remove(i);
-            }
-        }
 
-        enemyFigures.removeAll(removeEnemies);
-
+        enemyFigures.removeAll(removeFigures);
+        friendFigures.removeAll(removeFigures);
+        
         for (GameFigure g : enemyFigures) {
             g.update();
         }
         
-                // Remove bullet or missiles
+        for (int i = 0; i < friendFigures.size(); ++i) {
+            GameFigure ff = friendFigures.get(i);
+
+        }
+
         for (int i = 0; i < friendFigures.size(); i++) {
             GameFigure f1 = friendFigures.get(i);
-            if (f1.state == GameFigureState.STATE_DONE) {
-               friendFigures.remove(i);
+            if (f1 instanceof Bullet) {
+                if (f1.myState.getClass().equals(new DoneState().getClass())) {
+                    friendFigures.remove(i);
+                }
             }
+
+        }
+        
+        
+        for (int i = 0; i < enemyFigures.size(); i++) {
+            GameFigure ef = enemyFigures.get(i);
+            if (ef instanceof Asteroid) {
+                if (ef.myState.getClass().equals(new DoneState().getClass())) {
+                    enemyFigures.remove(i);
+                }
+            }
+
         }
     }
 }
