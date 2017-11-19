@@ -5,10 +5,11 @@ import java.util.concurrent.TimeUnit;
 import model.Asteroid;
 import model.Bullet;
 import model.DoneState;
+import model.Explosion;
 import model.GameFigure;
-import model.Hit;
 import model.HitState;
 import model.Missile;
+
 
 public class Animator implements Runnable {
 
@@ -16,7 +17,6 @@ public class Animator implements Runnable {
     private final int FRAMES_PER_SECOND = 60;
     public boolean gameStart = false;
     Random rand = new Random();
-    
     @Override
     public void run() {
 
@@ -46,6 +46,17 @@ public class Animator implements Runnable {
     }
     
     private void processCollisions() {
+        
+        for (GameFigure ef : Main.gameData.enemyFigures) {
+            if (Main.gameData.friendFigures.get(0).getCollisionBox().intersects(ef.getCollisionBox())) {
+                Main.gameData.healthBar.loseHealth();
+                ef.setState(new HitState());
+                ef.setState(new DoneState());
+            } else {
+                Main.gameData.healthBar.justLooseHealth = false;
+            }
+        }
+        
         for (GameFigure ef : Main.gameData.enemyFigures) {
             for (GameFigure ff : Main.gameData.friendFigures) {
                 if (ef.getCollisionBox().intersects(ff.getCollisionBox())) {
@@ -56,23 +67,8 @@ public class Animator implements Runnable {
                         ((Bullet) ff).setState(new HitState());
                         ff.myState.doAction(ff);
                         System.out.println("asteroidHealth: " + asteroid.asteroidHealth);
-                        if (asteroid.asteroidHealth <= 0) {
-
-                            // If large asteroid (128)
-                            if (asteroid.width > 127) {
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 1));
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 1));
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 1));
-                            } else if (asteroid.width > 63) {
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 2));
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 2));
-                            } else if (asteroid.width > 41) {
-                                Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 3));
-                            }
-                            
-                            ((Asteroid) ef).setState(new DoneState());
-                            Main.gameData.scoreBoard.score++;
-                        } 
+                        asteroid.setState(new HitState());
+                        asteroid.myState.doAction(asteroid);
                     }
                 } // End if collision
             } // End inner for
@@ -86,8 +82,8 @@ public class Animator implements Runnable {
                     if (ff instanceof Missile) {
                         float fx = ff.x;
                         float fy = ff.y;
-                        Hit hit = new Hit(fx, fy - (asteroid.height/2));  
-                        Main.gameData.friendFigures.add(hit);
+                        Explosion e = Main.gameData.explosionFactory.createExplosion(fx, fy);
+                        Main.gameData.friendFigures.add(e);
                         asteroid.asteroidHealth-=5;
                         ((Missile) ff).setState(new DoneState());
                         ((Missile) ff).myState.doAction(ff);

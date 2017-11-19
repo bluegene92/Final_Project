@@ -26,6 +26,11 @@ public class GameData {
     public int asteroidCount = 0;
     public AsteroidFactory asteroidFactory;
     public final List<GameFigure> removeFigures;
+    public ExplosionFactory explosionFactory;
+    public boolean gameOver = false;
+    
+    public Explosion explosion;
+    
     public GameData() {
         enemyFigures = new CopyOnWriteArrayList<>();
         friendFigures = new CopyOnWriteArrayList<>();
@@ -33,6 +38,8 @@ public class GameData {
         stars = new CopyOnWriteArrayList<>();
         healthBar = new HealthBar(50, 50);
         asteroidFactory = new AsteroidFactory();
+        explosionFactory = new ExplosionFactory();
+        
         startButton = new StartButton();
         playAgainButton = new PlayAgainButton();
 
@@ -58,6 +65,10 @@ public class GameData {
                 stars.add(new Star(rx, ry, speed, size));
         }
     }
+    
+    public void createExplosion() {
+        
+    }
 
     public void removeHit() {
         Timer timer = new Timer();
@@ -65,7 +76,7 @@ public class GameData {
             public void run() {
                 for (int i = 0; i < friendFigures.size(); i++) {
                     GameFigure ff = friendFigures.get(i);
-                    if (ff instanceof Hit) {
+                    if (ff instanceof Hit || ff instanceof Explosion) {
                         friendFigures.remove(i);
                     }
                 }
@@ -75,6 +86,7 @@ public class GameData {
     
     public void update() {
         healthBar.update();
+        startButton.update();
         for (GameFigure star : stars) {
             star.update();
         }

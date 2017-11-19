@@ -19,9 +19,7 @@ public class StartButton {
     
     public void draw(Graphics2D g) {
         g.setFont(new Font("Courier New", Font.BOLD, 24));
-
-        
-        if (!Main.animator.gameStart) {
+        if (!Main.animator.gameStart && !Main.gameData.gameOver) {
             if (!hovered) {
                 g.setColor(Color.WHITE);
                 g.draw(new Rectangle2D.Float(Main.gamePanel.getWidth()/2, 
@@ -36,11 +34,31 @@ public class StartButton {
                     Main.gamePanel.getHeight()/4 + 30);
 
             }
+        } else if (Main.gameData.gameOver) {
+            g.setFont(new Font("Courier New", Font.BOLD, 14));
+            if (!hovered) {
+                g.setColor(Color.WHITE);
+                
+                g.draw(new Rectangle2D.Float(Main.gamePanel.getWidth()/2, 
+                    Main.gamePanel.getHeight()/4, 100, 40));
+                g.drawString("Play Again", Main.gamePanel.getWidth()/2 + 10, 
+                    Main.gamePanel.getHeight()/4 + 20);
+            } else {
+                g.fill(new Rectangle2D.Float(Main.gamePanel.getWidth()/2, 
+                    Main.gamePanel.getHeight()/4, 100, 40));
+                g.setColor(Color.BLACK);
+                g.drawString("Play Again", Main.gamePanel.getWidth()/2 + 10, 
+                    Main.gamePanel.getHeight()/4 + 20);
+
+            }            
         }
 
     }
     
     public void update() {
-        
+        if (Main.gameData.gameOver) {
+            text = "Play Again";
+            Main.gameData.gameOver = false;
+        }
     }
 }

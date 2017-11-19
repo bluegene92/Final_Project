@@ -42,7 +42,7 @@ public class GamePanel extends JPanel {
             Main.gameData.scoreBoard.draw(g2);
             Main.gameData.startButton.draw(g2);
             Main.gameData.playAgainButton.draw(g2);
-
+            
             for (GameFigure f : Main.gameData.enemyFigures) {
                 f.render(g2);
             }

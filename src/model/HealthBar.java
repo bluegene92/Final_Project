@@ -1,6 +1,7 @@
 
 package model;
 
+import controller.Main;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -20,6 +21,9 @@ public class HealthBar extends GameFigure {
     private BufferedImage image;
     private BufferedImage healthBarImage;
     private int state;
+    public int index = 0;
+    public boolean justLooseHealth = false;
+    
     public HealthBar(float x, float y) {
         super(x, y);
         healthBarSprites = new CopyOnWriteArrayList<>();
@@ -35,13 +39,22 @@ public class HealthBar extends GameFigure {
             BufferedImage tmp = resize(image.getSubimage(0, i*120, 450, 120), 450/6, 120/6);
             healthBarSprites.add(tmp);
         }
-        healthBarImage = healthBarSprites.get(0);
+        healthBarImage = healthBarSprites.get(index);
     }
     
     
 
     public void loseHealth() {
+        if (health <= 1) {
+            Main.gameData.gameOver = true;
+            Main.animator.gameStart = false;
+            healthBarImage = healthBarSprites.get(5);
+        }
         
+        if (!justLooseHealth && index < 6) {
+            health--;
+            index++;
+        }
     }
     
 
@@ -64,21 +77,7 @@ public class HealthBar extends GameFigure {
     
     @Override
     public void update() {
-
-        if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_5) {
-            healthBarImage = healthBarSprites.get(0);
-        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_4) {
-            healthBarImage = healthBarSprites.get(1);
-        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_3) {
-            healthBarImage = healthBarSprites.get(2);
-        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_2) {
-            healthBarImage = healthBarSprites.get(3);
-        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_1) {
-            healthBarImage = healthBarSprites.get(4);
-        } else if (state == GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_0) {
-            healthBarImage = healthBarSprites.get(5);
-        } 
-        
+        healthBarImage = healthBarSprites.get(index);
     }
 
     @Override

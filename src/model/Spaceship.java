@@ -25,6 +25,7 @@ public class Spaceship extends GameFigure {
     public static double imageAngleRad = 0;
     public boolean boosterFlag = false;
     public int missileCharge;
+    public int health = 5;
     
     private int direction = 1; // +1: to the right; -1 to the left
 
