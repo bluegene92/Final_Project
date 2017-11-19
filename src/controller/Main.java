@@ -6,7 +6,7 @@ import view.GamePanel;
 import view.MainWindow;
 
 /**
- * Version: 1.1
+ * Version: 1.2
  * @author dattr
  */
 public class Main {
