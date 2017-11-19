@@ -19,7 +19,7 @@ public class MouseController extends MouseAdapter {
     public static int y;
     volatile private boolean mouseDown = false;
     Spaceship spaceship = (Spaceship) Main.gameData.friendFigures.get(0);
-    private int timeUntilShootMissile = 2;
+    private int timeUntilShootMissile = 5;
     
     public MouseController() {
         enableMissile();
@@ -49,30 +49,28 @@ public class MouseController extends MouseAdapter {
         
         
         if (SwingUtilities.isLeftMouseButton(me)) {
+
+            // Shoot only if the game started
+            if (Main.animator.gameStart) {
+                Bullet bullet = new Bullet(
+                spaceship.x + 64,
+                spaceship.y + (29 / 2),
+                px, py,
+                Color.YELLOW);
+                Main.gameData.friendFigures.add(bullet);
+            }
             
             // If the game haven't start
-            if (!Main.animator.gameStart && !Main.gameData.gameOver) {
+            if (!Main.animator.gameStart) {
                 if (px > Main.gamePanel.getWidth()/2 &&
                 px < Main.gamePanel.getWidth()/2 + 100 &&
                 py > Main.gamePanel.getHeight()/4 && 
                 py < Main.gamePanel.getHeight()/4 + 40) {
                     Main.animator.gameStart = true;
-                    Main.gameData.gameOver = false;
+                    Main.gameData.gameReset();
                 }
             }
-            
-            
-            
-            Bullet bullet = new Bullet(
-                spaceship.x + 64,
-                spaceship.y + (29 / 2),
-                px, py,
-                Color.YELLOW);
-            
-            // Shoot only if the game started
-            if (Main.animator.gameStart) {
-                Main.gameData.friendFigures.add(bullet);
-            }
+
         } else if (SwingUtilities.isRightMouseButton(me)) {
             // Shoot only if the game started
             if (Main.animator.gameStart && spaceship.missileCharge >= timeUntilShootMissile) {
@@ -103,7 +101,7 @@ public class MouseController extends MouseAdapter {
         }
         
         // If the game haven't started, allow mouse to hover over start menu
-        if (!Main.animator.gameStart && !Main.gameData.gameOver) {
+        if (!Main.animator.gameStart) {
             if (x > Main.gamePanel.getWidth()/2 &&
                 x < Main.gamePanel.getWidth()/2 + 100 &&
                 y > Main.gamePanel.getHeight()/4 && 
@@ -112,16 +110,7 @@ public class MouseController extends MouseAdapter {
             } else {
                 Main.gameData.startButton.hovered = false;
             }
-        } else if (Main.gameData.gameOver) {
-            if (x > Main.gamePanel.getWidth()/2 &&
-                x < Main.gamePanel.getWidth()/2 + 100 &&
-                y > Main.gamePanel.getHeight()/4 && 
-                y < Main.gamePanel.getHeight()/4 + 40) {
-                Main.gameData.startButton.hovered = true;
-            } else {
-                Main.gameData.startButton.hovered = false;
-            }            
-        }
+        } 
         
     }
 

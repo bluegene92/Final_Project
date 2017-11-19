@@ -27,7 +27,6 @@ public class GameData {
     public AsteroidFactory asteroidFactory;
     public final List<GameFigure> removeFigures;
     public ExplosionFactory explosionFactory;
-    public boolean gameOver = false;
     
     public Explosion explosion;
     
@@ -50,11 +49,33 @@ public class GameData {
         removeHit();
     }
     
+    public void gameReset() {
+        this.healthBar.health = 5;
+        this.healthBar.index = 0;
+        for (int i = 0; i < enemyFigures.size(); i++) {
+            GameFigure ef = enemyFigures.get(i);
+            if (ef instanceof Asteroid) {
+                enemyFigures.remove(i);
+            }
+        }
+    }
+    
     public void addAsteroid() {
         enemyFigures.add(asteroidFactory.getAsteroid());
-        System.out.println("adding asteroid");
     }
 
+    public void addMediumAsteroid() {
+        enemyFigures.add(asteroidFactory.getMediumAsteroid());
+    }
+    
+    public void addSmallAsteroid() {
+        enemyFigures.add(asteroidFactory.getSmallAsteroid());
+    }
+        
+    public void addTinyAsteroid() {
+        enemyFigures.add(asteroidFactory.getTinyAsteroid());
+    }
+    
     public void addStars() {
             Random rand = new Random();
             for (int i = 0; i < 100; ++i) {

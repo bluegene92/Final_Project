@@ -44,6 +44,18 @@ public class AsteroidFactory {
         return new Asteroid(asteroidList.get(0), Main.WIN_WIDTH, 250, 1, 0);
     }
     
+    public Asteroid getMediumAsteroid() {
+        return new Asteroid(asteroidList.get(0), Main.WIN_WIDTH, 250, 2, 0);
+    }
+    
+    public Asteroid getSmallAsteroid() {
+        return new Asteroid(asteroidList.get(0), Main.WIN_WIDTH, 250, 3, 0);
+    }
+
+    public Asteroid getTinyAsteroid() {
+        return new Asteroid(asteroidList.get(0), Main.WIN_WIDTH, 250, 4, 0);
+    }
+    
     public Asteroid getExplodedAsteroid(float sx, float sy, int orig) {
 
         int rx = rand.nextInt(Main.WIN_WIDTH);

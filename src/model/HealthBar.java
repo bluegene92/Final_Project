@@ -2,7 +2,6 @@
 package model;
 
 import controller.Main;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
@@ -22,7 +21,7 @@ public class HealthBar extends GameFigure {
     private BufferedImage healthBarImage;
     private int state;
     public int index = 0;
-    public boolean justLooseHealth = false;
+    public boolean hit = false;
     
     public HealthBar(float x, float y) {
         super(x, y);
@@ -45,16 +44,25 @@ public class HealthBar extends GameFigure {
     
 
     public void loseHealth() {
-        if (health <= 1) {
-            Main.gameData.gameOver = true;
+        health--;
+        index++;
+        System.out.println("my health: " + health);
+        if (health < 1 && index >= 5) {
+            index = 5;
+            System.out.println("my health: " + health);
             Main.animator.gameStart = false;
-            healthBarImage = healthBarSprites.get(5);
         }
-        
-        if (!justLooseHealth && index < 6) {
-            health--;
-            index++;
-        }
+//        if (health <= 1) {
+//            Main.animator.gameStart = false;
+//            healthBarImage = healthBarSprites.get(5);
+//        }
+//        
+//        if (!justLooseHealth && index < 6) {
+//            health--;
+//            justLooseHealth = true;
+//            System.out.println("my health: " + health);
+//            index++;
+//        }
     }
     
 

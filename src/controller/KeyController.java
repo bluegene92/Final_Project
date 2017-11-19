@@ -52,8 +52,14 @@ public class KeyController extends KeyAdapter {
                 spaceship.x + 64,
                 spaceship.y + (29 / 2),
                 MouseController.x, MouseController.y));
-        } else if (code == KeyEvent.VK_A) {
+        } else if (code == KeyEvent.VK_1) {
             Main.gameData.addAsteroid();
+        } else if (code == KeyEvent.VK_2) {
+            Main.gameData.addMediumAsteroid();
+        } else if (code == KeyEvent.VK_3) {
+            Main.gameData.addSmallAsteroid();
+        } else if (code == KeyEvent.VK_4) {
+            Main.gameData.addTinyAsteroid();
         }
         
     }

@@ -23,8 +23,9 @@ public class Animator implements Runnable {
         while (running) {
             long startTime = System.currentTimeMillis();
             
-            processCollisions();
+            //processCollisions();
             if (gameStart) {
+                processCollisions();
                 Main.gameData.update();
             }
             Main.gamePanel.gameRender();
@@ -46,16 +47,19 @@ public class Animator implements Runnable {
     }
     
     private void processCollisions() {
-        
         for (GameFigure ef : Main.gameData.enemyFigures) {
             if (Main.gameData.friendFigures.get(0).getCollisionBox().intersects(ef.getCollisionBox())) {
-                Main.gameData.healthBar.loseHealth();
-                ef.setState(new HitState());
-                ef.setState(new DoneState());
-            } else {
-                Main.gameData.healthBar.justLooseHealth = false;
+                Asteroid asteroid = (Asteroid) ef;
+                if (!Main.gameData.healthBar.hit) {
+                    Main.gameData.healthBar.loseHealth();
+                    Main.gameData.healthBar.hit = true;
+                }
+                asteroid.setState(new DoneState());
+                asteroid.myState.doAction(asteroid);
             }
         }
+        
+        Main.gameData.healthBar.hit = false;
         
         for (GameFigure ef : Main.gameData.enemyFigures) {
             for (GameFigure ff : Main.gameData.friendFigures) {
@@ -66,7 +70,7 @@ public class Animator implements Runnable {
                         asteroid.asteroidHealth--;
                         ((Bullet) ff).setState(new HitState());
                         ff.myState.doAction(ff);
-                        System.out.println("asteroidHealth: " + asteroid.asteroidHealth);
+//                        System.out.println("asteroidHealth: " + asteroid.asteroidHealth);
                         asteroid.setState(new HitState());
                         asteroid.myState.doAction(asteroid);
                     }
@@ -87,7 +91,7 @@ public class Animator implements Runnable {
                         asteroid.asteroidHealth-=5;
                         ((Missile) ff).setState(new DoneState());
                         ((Missile) ff).myState.doAction(ff);
-                        System.out.println("asteroidHealth: " + asteroid.asteroidHealth);
+//                        System.out.println("asteroidHealth: " + asteroid.asteroidHealth);
                         if (asteroid.asteroidHealth <= 0) {
                             ((Asteroid) ef).setState(new DoneState());
                             Main.gameData.scoreBoard.score++;
