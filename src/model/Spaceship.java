@@ -20,12 +20,12 @@ public class Spaceship extends GameFigure {
     private float mouseY;
     public int dy = 3;
     private BufferedImage image;
-    private List<BufferedImage> spaceshipSprites;
     private int frameNumber = 0;
     public static double imageAngleRad = 0;
     public boolean boosterFlag = false;
     public int missileCharge;
     public int health = 5;
+    public HealthBar healthBar;
     
     private int direction = 1; // +1: to the right; -1 to the left
 
@@ -35,6 +35,7 @@ public class Spaceship extends GameFigure {
         super.state = GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_5;
         missileCharge = 5;
         setState(new ActiveState());
+        healthBar = new HealthBar(50, 50);
         try {
             image = ImageIO.read(getClass().getResource("f1.png"));
         } catch (IOException ex) {
@@ -91,8 +92,10 @@ public class Spaceship extends GameFigure {
     
     @Override
     public Rectangle2D getCollisionBox() {
-        return new Rectangle2D.Float(super.x, (int) super.y,
-                WIDTH, HEIGHT);
+        return new Rectangle2D.Float(super.x, (int) super.y, WIDTH, HEIGHT);
     }
-
+    
+    @Override
+    public void hit(GameFigure gameFigure) {
+    }
 }

@@ -6,7 +6,6 @@
 
 package model;
 
-import controller.Main;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -18,27 +17,27 @@ import java.util.Random;
 public class Asteroid extends GameFigure {
 
     private BufferedImage asteroidImage;
-    private float xSpeed = 3;
-    private Random rand = new Random();
-    private boolean speedFlag = false;
+    public float xSpeed = 3;
+    public Random rand = new Random();
+    public boolean speedFlag = false;
     public static int count = 0;
     private final int MAX = 5;
     private AffineTransform transformer = new AffineTransform();
-    private double angle = 360;
+    public double angle = 360;
     public float width, height;
-    private double offset = 0.5; // Speed of rotation
-    private float rotateDirection = 0.0f;
+    public double offset = 0.5; // Speed of rotation
+    public float rotateDirection = 0.0f;
     public int asteroidHealth;
     private int asteroidType;
     public float dx = 0.0f;
     public float dy = 0.0f;
     private int size = 1;
     public boolean breakOff = false;
+    public boolean isHit = false;
     
     public Asteroid(BufferedImage sprite, float x, float y, int size, int type) {
         super(x, y);
-        asteroidHealth = (6-size) * 2;
-        //float random = min + r.nextFloat() * (max - min);
+        asteroidHealth = (6 - size) * 2;
         xSpeed = 1 + rand.nextFloat() * (8 - 1);
         asteroidType = type;
         rotateDirection = (float) Math.random();
@@ -46,9 +45,7 @@ public class Asteroid extends GameFigure {
         width = asteroidImage.getWidth();
         height = asteroidImage.getHeight();
         this.size = size;
-        setState(new ActiveState());
-        System.out.println(myState.toString());
-        System.out.println("health: " + asteroidHealth);
+        myState = new AsteroidLaunchState();
     }
     
     
@@ -65,7 +62,7 @@ public class Asteroid extends GameFigure {
         width = asteroidImage.getWidth();
         height = asteroidImage.getHeight();
         this.size = size;
-        setState(new ActiveState());
+        myState = new AsteroidLaunchState();
         System.out.println("break off");
     }
 
@@ -85,6 +82,11 @@ public class Asteroid extends GameFigure {
         //g.draw(new Rectangle.Float(super.x + (width/10), super.y + height/10, (float) width*0.8f, (float) height*0.8f));
 
     }
+    
+    @Override
+    public void setState(State s) {
+        myState = s;
+    }
 
     public void rotateCounterClockwise() {
         angle -= offset;
@@ -102,28 +104,7 @@ public class Asteroid extends GameFigure {
     
     @Override
     public void update() {
-        
-        if (rotateDirection < 0.5) {
-            rotateCounterClockwise();
-        } else {
-            rotateClockwise();
-        }
-        
-        if (speedFlag) {
-            super.x-=xSpeed*1.8;
-        } else {
-            if (!breakOff) {
-                super.x -= xSpeed;
-            }
-        }
-        
-
-
-        if (super.x <= -200) {
-            rotateDirection = (float) Math.random();
-            super.x = Main.WIN_WIDTH + 200;
-            super.y = rand.nextInt(Main.WIN_HEIGHT);
-        }
+        myState.doAction(this);
     }
     
     public void speedUp() {
@@ -137,6 +118,24 @@ public class Asteroid extends GameFigure {
     @Override
     public Rectangle2D getCollisionBox() {
         return new Rectangle.Float(super.x + (width/10), super.y + height/10, (float) width*0.8f, (float) height*0.8f);
+    }
+
+    @Override
+    public void hit(GameFigure gameFigure) {
+        if (!isHit) {
+            if (gameFigure instanceof Bullet) {
+                asteroidHealth--;
+                isHit = true;
+            } else if (gameFigure instanceof Missile) {
+                asteroidHealth -= 5;
+                isHit = true;
+            }
+        }
+        
+        if (asteroidHealth <= 0) {
+            setState(new AsteroidExplodeState());
+        }
+        System.out.println(asteroidHealth);
     }
 
 }

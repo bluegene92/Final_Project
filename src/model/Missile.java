@@ -30,11 +30,15 @@ public class Missile extends GameFigure {
     private BufferedImage smallMissile;
     private int width;
     private int height;
-    public State myState = new ActiveState();
+    public Asteroid tempAsteroid;
+    public EnemyUFO tempUFO;
+    public Boss tempBoss;
+    
     public Missile(float sx, float sy, float tx, float ty) {
         super(sx, sy);
         super.state = GameFigureState.MISSILE_STATE_LAUNCHED;
         missileSprites = new CopyOnWriteArrayList<>();
+        myState = new MissileLaunchState();
         try {
             image = ImageIO.read(getClass().getResource("missiles.png"));
             
@@ -61,10 +65,6 @@ public class Missile extends GameFigure {
     @Override
     public void render(Graphics2D g) {
         g.drawImage(smallMissile, (int) super.x, (int) super.y, null);
-//        g.draw(new Rectangle2D.Float(
-//                (int) (super.x),
-//                (int) (super.y),
-//                width, height));
     }
 
     @Override
@@ -86,13 +86,6 @@ public class Missile extends GameFigure {
         super.x += xSpeed;
         xSpeed *= 1.05;
     }
-
-    public void updateState() {
-        if (super.x > Main.WIN_WIDTH + 10) {
-            setState(new DoneState());
-        }
-    }
-   
     
     @Override
     public Rectangle2D getCollisionBox() {
@@ -101,5 +94,20 @@ public class Missile extends GameFigure {
                 (int) (super.y),
                 width, height);
     }
-
+    
+    @Override
+    public void hit(GameFigure gameFigure) {
+        setState(new MissileExplodeState());
+        myState.doAction(this);
+        if (gameFigure instanceof Asteroid) {
+            tempAsteroid = (Asteroid) gameFigure;
+            tempAsteroid.isHit = false;
+        } else if (gameFigure instanceof EnemyUFO) {
+            tempUFO = (EnemyUFO) gameFigure;
+            tempUFO.isHit = false;
+        } else if (gameFigure instanceof Boss) {
+            tempBoss = (Boss) gameFigure;
+            tempBoss.isHit = false;
+        }
+    }
 }

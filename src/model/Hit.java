@@ -48,5 +48,7 @@ public class Hit extends GameFigure {
     public Rectangle2D getCollisionBox() {
         return new Rectangle2D.Float(x, y, width, height);
     }
-    
+    @Override
+    public void hit(GameFigure gameFigure) {
+    }    
 }

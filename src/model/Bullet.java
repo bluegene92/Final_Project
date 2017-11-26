@@ -31,12 +31,15 @@ public class Bullet extends GameFigure {
     private BufferedImage image;
     int width;
     int height;
-    public State myState = new ActiveState();
+    public Asteroid tempAsteroid;
+    public EnemyUFO tempUFO;
+    public Boss tempBoss;
+    
     public Bullet(float sx, float sy, float tx, float ty, Color color) {
         super(sx, sy);
         this.target = new Point2D.Float(tx, ty);
         this.color = color;
-        setState(new LaunchState());
+        myState = new BulletLaunchState();
         double angle = Math.atan2(ty - sy, tx - sx);
         dx = (float) (UNIT_TRAVEL_DISTANCE * Math.cos(angle));
         dy = (float) (UNIT_TRAVEL_DISTANCE * Math.sin(angle));
@@ -65,6 +68,11 @@ public class Bullet extends GameFigure {
     public void update() {
         myState.doAction(this);
     }
+    
+    @Override
+    public void setState(State s) {
+        myState = s;
+    }
 
     public void updateLocation() {
         super.x += dx;
@@ -74,6 +82,7 @@ public class Bullet extends GameFigure {
             super.y < -10 || 
             super.y > Main.WIN_HEIGHT + 10) {
             setState(new DoneState());
+            myState.doAction(this);
         }
     }
 
@@ -87,5 +96,22 @@ public class Bullet extends GameFigure {
                 super.y - size / 2, 
                 size * 2, 
                 size / 2);
+    }
+    
+    @Override
+    public void hit(GameFigure gameFigure) {
+        setState(new BulletHitState());
+        myState.doAction(this);
+        
+        if (gameFigure instanceof Asteroid) {
+            tempAsteroid = (Asteroid) gameFigure;
+            tempAsteroid.isHit = false;
+        } else if (gameFigure instanceof EnemyUFO) {
+            tempUFO = (EnemyUFO) gameFigure;
+            tempUFO.isHit = false;
+        } else if (gameFigure instanceof Boss) {
+            tempBoss = (Boss) gameFigure;
+            tempBoss.isHit = false;
+        }
     }
 }

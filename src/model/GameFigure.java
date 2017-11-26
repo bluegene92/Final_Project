@@ -42,4 +42,6 @@ public abstract class GameFigure implements CollisionBox {
         return myState;
     }
     
+    public abstract void hit(GameFigure gameFigure);
+    
 }

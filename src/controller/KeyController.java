@@ -27,8 +27,10 @@ public class KeyController extends KeyAdapter {
             }
             
             for (GameFigure a : Main.gameData.enemyFigures) {
-                Asteroid asteroid = (Asteroid) a;
-                asteroid.speedUp();
+                if (a instanceof Asteroid) {
+                    Asteroid asteroid = (Asteroid) a;
+                    asteroid.speedUp();
+                }
             }
         }
     }
@@ -43,8 +45,11 @@ public class KeyController extends KeyAdapter {
                 s.boosterOff();
             }
             for (GameFigure a : Main.gameData.enemyFigures) {
-                Asteroid asteroid = (Asteroid) a;
-                asteroid.speedDown();
+                
+                if (a instanceof Asteroid) {
+                    Asteroid asteroid = (Asteroid) a;
+                    asteroid.speedDown();
+                }
             }
             
         } else if (code == KeyEvent.VK_M) {
@@ -60,6 +65,12 @@ public class KeyController extends KeyAdapter {
             Main.gameData.addSmallAsteroid();
         } else if (code == KeyEvent.VK_4) {
             Main.gameData.addTinyAsteroid();
+        } else if (code == KeyEvent.VK_U) {
+            Main.gameData.addUFO();
+        } else if (code == KeyEvent.VK_5) {
+            Main.gameData.addTestUFO();
+        } else if (code == KeyEvent.VK_B) {
+            Main.gameData.addBoss();
         }
         
     }

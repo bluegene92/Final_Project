@@ -41,7 +41,10 @@ public class HealthBar extends GameFigure {
         healthBarImage = healthBarSprites.get(index);
     }
     
-    
+    public void reset() {
+        health = 5;
+        index = 0;
+    }
 
     public void loseHealth() {
         health--;
@@ -49,20 +52,8 @@ public class HealthBar extends GameFigure {
         System.out.println("my health: " + health);
         if (health < 1 && index >= 5) {
             index = 5;
-            System.out.println("my health: " + health);
             Main.animator.gameStart = false;
         }
-//        if (health <= 1) {
-//            Main.animator.gameStart = false;
-//            healthBarImage = healthBarSprites.get(5);
-//        }
-//        
-//        if (!justLooseHealth && index < 6) {
-//            health--;
-//            justLooseHealth = true;
-//            System.out.println("my health: " + health);
-//            index++;
-//        }
     }
     
 
@@ -92,4 +83,8 @@ public class HealthBar extends GameFigure {
     public Rectangle2D getCollisionBox() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    @Override
+    public void hit(GameFigure gameFigure) {
+    }    
 }
