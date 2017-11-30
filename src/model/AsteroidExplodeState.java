@@ -1,9 +1,8 @@
 package model;
-
 import controller.Main;
 
 public class AsteroidExplodeState implements State {
-
+    
     @Override
     public void doAction(GameFigure gameFigure) {
         Asteroid asteroid = (Asteroid) gameFigure;
@@ -19,10 +18,8 @@ public class AsteroidExplodeState implements State {
             } else if (asteroid.width > 41) {
                 Main.gameData.enemyFigures.add(Main.gameData.asteroidFactory.getExplodedAsteroid(asteroid.x, asteroid.y, 3));
             }
-
             asteroid.setState(new DoneState());
-            Main.gameData.scoreBoard.score++;
+            Main.gameData.scoreBoard.increaseScore();
         } 
     }
-
 }

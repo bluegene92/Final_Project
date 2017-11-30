@@ -1,6 +1,4 @@
 package model;
-
-import controller.Main;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -13,14 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-public class Missile extends GameFigure {
-
-    // missile size
+public class Missile extends GameFigure implements CollisionVistable {
     private static final int SIZE = 5;
-    private float dx; // displacement at each frame
-    private float dy; // displacement at each frame
-
-    // public properties for quick access
     public Color color;
     public Point2D.Float target;
     private BufferedImage image;
@@ -109,5 +101,10 @@ public class Missile extends GameFigure {
             tempBoss = (Boss) gameFigure;
             tempBoss.isHit = false;
         }
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 }

@@ -1,22 +1,23 @@
 package model;
-
 import controller.Main;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
-public class Boss extends GameFigure {
-
-    
+public class Boss extends GameFigure implements CollisionVistable {
     private BufferedImage image;
     public int width;
     public int height;
     public BossHealthBar bossHealthBar = new BossHealthBar(Main.WIN_WIDTH - 220, 20);
     private float collisionX;
     public boolean isHit = false;
+    private Timer timer;
     
     public Boss(float x, float y) {
         super(x, y);
@@ -30,10 +31,33 @@ public class Boss extends GameFigure {
             width = image.getWidth();
             height = image.getHeight();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error: Cannot open ufo.png");
+            JOptionPane.showMessageDialog(null, "Error: Cannot open boss.png");
             System.exit(-1);            
         }
         collisionX = (float) (width * 0.6);
+    }
+    
+    ActionListener actionFire = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            fire();
+        }
+    };
+    
+    public void fire() {
+        Main.gameData.enemyFigures.add(
+                new FireBall(x + width/2, y + height/2, 
+                        Main.gameData.spaceship.x, 
+                        Main.gameData.spaceship.y));
+        Main.gameData.enemyFigures.add(
+        new FireBall(x + width/2, y + height/2, 
+                Main.gameData.spaceship.x, 
+                Main.gameData.spaceship.y - 220));
+
+        Main.gameData.enemyFigures.add(
+        new FireBall(x + width/2, y + height/2, 
+                Main.gameData.spaceship.x, 
+                Main.gameData.spaceship.y + 220));        
     }
     
     @Override
@@ -70,5 +94,10 @@ public class Boss extends GameFigure {
                 isHit = true;
             }
         }
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 }

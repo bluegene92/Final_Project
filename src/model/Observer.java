@@ -4,17 +4,9 @@
  * and open the template in the editor.
  */
 
-package view;
+package model;
 
-import java.awt.Graphics2D;
 
-public class PlayAgainButton {
-
-    private String text = "Play Again";
-    
-    
-    public void draw(Graphics2D g) {
-        
-    }
-    
+public interface Observer {
+    void update(int n);
 }

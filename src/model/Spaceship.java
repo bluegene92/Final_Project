@@ -3,15 +3,17 @@ package model;
 import controller.Main;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
-public class Spaceship extends GameFigure {
+public class Spaceship extends GameFigure implements CollisionVistable {
 
     private final int WIDTH = 64;
     private final int HEIGHT = 29;
@@ -26,13 +28,14 @@ public class Spaceship extends GameFigure {
     public int missileCharge;
     public int health = 5;
     public HealthBar healthBar;
-    
     private int direction = 1; // +1: to the right; -1 to the left
-
+    public boolean forceFieldFlag = false;
+    public Timer manaTimer;
+    public Timer manaRecharge;
+    public boolean isHit = false;
+    
     public Spaceship(float x, float y) {
         super(x, y); // origin: upper-left corner
-        super.state = GameFigureState.SPACESHIP_STATE_APPEARED;
-        super.state = GameFigureState.SPACESHIP_STATE_HEALTH_LEVEL_5;
         missileCharge = 5;
         setState(new ActiveState());
         healthBar = new HealthBar(50, 50);
@@ -42,6 +45,22 @@ public class Spaceship extends GameFigure {
             JOptionPane.showMessageDialog(null, "Error: Cannot open spaceship.png");
             System.exit(-1);
         }
+        
+        manaTimer = new Timer(100, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Main.gameData.manaBar.mana > 0) {
+                    Main.gameData.manaBar.mana--;
+                }
+            }
+        });
+        
+        manaRecharge = new Timer(500, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (Main.gameData.manaBar.mana <= 50) {
+                    Main.gameData.manaBar.mana++;
+                }
+            }
+        });
     }
 
     @Override
@@ -55,6 +74,7 @@ public class Spaceship extends GameFigure {
         g.translate(-cx, -cy);
         g.drawImage(image, 0, 0, null);
         g.setTransform(oldAT);
+        healthBar.render(g);
     }
 
     
@@ -63,9 +83,32 @@ public class Spaceship extends GameFigure {
         this.mouseY = y;
     }
     
-    /**
-     * How the spaceship will move
-     */
+    public void turnOnForceField() {
+        if (!forceFieldFlag) {
+            float x = Main.gameData.spaceship.x;
+            float y = Main.gameData.spaceship.y;
+            Main.gameData.friendFigures.add(new ForceField(x, y));
+            manaTimer.start();
+            manaRecharge.stop();
+            forceFieldFlag = true;
+        }
+        
+    }
+    
+    public void turnOffForceField() {
+        if (forceFieldFlag) {
+            for (GameFigure ff : Main.gameData.friendFigures) {
+                if (ff instanceof ForceField) {
+                    Main.gameData.removeFigures.add(ff);
+                }
+            }
+            manaTimer.stop();
+            manaRecharge.start();
+            forceFieldFlag = false;
+        }
+
+    }
+    
     @Override
     public void update() {
         if (super.y < mouseY - 10) {
@@ -97,5 +140,25 @@ public class Spaceship extends GameFigure {
     
     @Override
     public void hit(GameFigure gameFigure) {
+        if (!isHit) {
+            loseHealth();
+            isHit = true;
+        }
+    }
+    
+    public void loseHealth() {
+        if (healthBar.index >= 0 && healthBar.index < 5) {
+            healthBar.index++;
+        }
+        
+        if (healthBar.index >= 5) {
+            Main.animator.gameStart = false;
+        }
+        System.out.println(healthBar.index);
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 }

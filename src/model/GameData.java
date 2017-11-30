@@ -1,44 +1,41 @@
 package model;
-
 import controller.Main;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
-import view.PlayAgainButton;
 import view.StartButton;
 
 public class GameData {
-
-    private final int RADIUS = 6;
     public final List<GameFigure> enemyFigures;
     public final List<GameFigure> friendFigures;
     public final List<GameFigure> stars;
-    public static Spaceship spaceship;
+    public Spaceship spaceship;
     public Boss boss = new Boss(Main.WIN_WIDTH, Main.WIN_HEIGHT/2);
     public HealthBar healthBar;
     public Score scoreBoard;
     public StartButton startButton;
-    public PlayAgainButton playAgainButton;
     public int asteroidCount = 0;
     public AsteroidFactory asteroidFactory;
     public final List<GameFigure> removeFigures;
     private Random rand = new Random();
     public Explosion explosion;
+    public ForceField forceField;
+    public Mana manaBar;
     
     public GameData() {
         enemyFigures = new CopyOnWriteArrayList<>();
         friendFigures = new CopyOnWriteArrayList<>();
         removeFigures = new CopyOnWriteArrayList<>();
         stars = new CopyOnWriteArrayList<>();
-        healthBar = new HealthBar(50, 50);
+        manaBar = new Mana(50, 25);
         asteroidFactory = new AsteroidFactory();
         startButton = new StartButton();
-        playAgainButton = new PlayAgainButton();
         spaceship = new Spaceship(30, Main.WIN_HEIGHT / 2);
         friendFigures.add(spaceship);
         scoreBoard = new Score();
+        forceField = new ForceField(spaceship.x, spaceship.y);
         addStars();
         removeHit();
     }
@@ -76,6 +73,10 @@ public class GameData {
         enemyFigures.add(new EnemyUFO(250, 100));
     }
     
+    public void fire() {
+        boss.fire();
+    }
+    
     public void addStars() {
             Random rand = new Random();
             for (int i = 0; i < 100; ++i) {
@@ -107,12 +108,11 @@ public class GameData {
     
     public void update() {
         spaceship.healthBar.update();
-        startButton.update();
+        manaBar.update();
         
         for (GameFigure star : stars) {
             star.update();
         }
-
         
         for (GameFigure g : friendFigures) {
             g.update();
@@ -124,17 +124,6 @@ public class GameData {
         for (GameFigure g : enemyFigures) {
             g.update();
         }
-
-//        for (int i = 0; i < friendFigures.size(); i++) {
-//            GameFigure f1 = friendFigures.get(i);
-//            if (f1 instanceof Bullet) {
-//                if (f1.myState.getClass().equals(new DoneState().getClass())) {
-//                    friendFigures.remove(i);
-//                }
-//            }
-//
-//        }
-        
         
         for (int i = 0; i < enemyFigures.size(); i++) {
             GameFigure ef = enemyFigures.get(i);

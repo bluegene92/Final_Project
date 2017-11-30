@@ -1,5 +1,4 @@
 package view;
-
 import controller.Main;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,8 +9,6 @@ import javax.swing.JPanel;
 import model.GameFigure;
 
 public class GamePanel extends JPanel {
-
-    // size of the canvas - determined at runtime once rendered
     public static int width;
     public static int height;
 
@@ -37,11 +34,10 @@ public class GamePanel extends JPanel {
         g2.setBackground(Color.BLACK);
 
         if (Main.animator.running) {
-            
-            Main.gameData.healthBar.render(g2);
+            Main.gameData.spaceship.healthBar.render(g2);
+            Main.gameData.manaBar.render(g2);
             Main.gameData.scoreBoard.draw(g2);
             Main.gameData.startButton.draw(g2);
-            Main.gameData.playAgainButton.draw(g2);
             
             for (GameFigure f : Main.gameData.enemyFigures) {
                 f.render(g2);

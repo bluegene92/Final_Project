@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package model;
-
 import controller.Main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -17,13 +11,10 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-public class Bullet extends GameFigure {
-
-    // missile size
+public class Bullet extends GameFigure implements CollisionVistable {
     private static final int SIZE = 5;
-    private static final int MAX_EXPLOSION_SIZE = 50;
-    private float dx; // displacement at each frame
-    private float dy; // displacement at each frame
+    private float dx;
+    private float dy;
     public Color color;
     public Point2D.Float target;
     private static final int UNIT_TRAVEL_DISTANCE = 8; // per frame move
@@ -56,6 +47,7 @@ public class Bullet extends GameFigure {
 
     @Override
     public void render(Graphics2D g) {
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setColor(color);
         g.setStroke(new BasicStroke(2)); // thickness of the line
         g.fill(new Rectangle2D.Float(super.x - size / 2, 
@@ -113,5 +105,10 @@ public class Bullet extends GameFigure {
             tempBoss = (Boss) gameFigure;
             tempBoss.isHit = false;
         }
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 }

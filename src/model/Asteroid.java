@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package model;
-
+import controller.Main;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -14,8 +8,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class Asteroid extends GameFigure {
-
+public class Asteroid extends GameFigure implements CollisionVistable {
     private BufferedImage asteroidImage;
     public float xSpeed = 3;
     public Random rand = new Random();
@@ -63,7 +56,6 @@ public class Asteroid extends GameFigure {
         height = asteroidImage.getHeight();
         this.size = size;
         myState = new AsteroidLaunchState();
-        System.out.println("break off");
     }
 
     
@@ -122,6 +114,13 @@ public class Asteroid extends GameFigure {
 
     @Override
     public void hit(GameFigure gameFigure) {
+        
+        // If hit by bullet
+        if (gameFigure instanceof Bullet) {
+            accept(ForceFieldCollisionVisitor.getInstance());
+        }
+        
+        
         if (!isHit) {
             if (gameFigure instanceof Bullet) {
                 asteroidHealth--;
@@ -129,6 +128,11 @@ public class Asteroid extends GameFigure {
             } else if (gameFigure instanceof Missile) {
                 asteroidHealth -= 5;
                 isHit = true;
+            } else if (gameFigure instanceof ForceField) {
+                setState(new DoneState());
+            } else if (gameFigure instanceof Spaceship) {
+                setState(new DoneState());
+                Main.gameData.spaceship.isHit = false;
             }
         }
         
@@ -136,6 +140,11 @@ public class Asteroid extends GameFigure {
             setState(new AsteroidExplodeState());
         }
         System.out.println(asteroidHealth);
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 
 }

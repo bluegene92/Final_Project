@@ -14,7 +14,7 @@ public class AsteroidLaunchState implements State {
         }
         
         if (asteroid.speedFlag) {
-            asteroid.x-=asteroid.xSpeed*1.8;
+            asteroid.x -= asteroid.xSpeed*1.8;
         } else {
             if (!asteroid.breakOff) {
                 asteroid.x -= asteroid.xSpeed;
@@ -27,5 +27,4 @@ public class AsteroidLaunchState implements State {
             asteroid.y = asteroid.rand.nextInt(Main.WIN_HEIGHT);
         }
     }
-
 }

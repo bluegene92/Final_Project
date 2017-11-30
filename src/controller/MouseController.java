@@ -1,5 +1,4 @@
 package controller;
-
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -7,17 +6,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 import model.Bullet;
-import model.GameFigure;
-import model.Hit;
 import model.Missile;
 import model.Score;
 import model.Spaceship;
 
 public class MouseController extends MouseAdapter {
-    
     public static int x;
     public static int y;
-    volatile private boolean mouseDown = false;
     Spaceship spaceship = (Spaceship) Main.gameData.friendFigures.get(0);
     private int timeUntilShootMissile = 5;
     
@@ -111,7 +106,5 @@ public class MouseController extends MouseAdapter {
                 Main.gameData.startButton.hovered = false;
             }
         } 
-        
-    }
-
-}
+    } // End mouseMoved
+} // End class MouseController

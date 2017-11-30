@@ -8,7 +8,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-public class EnemyUFO extends GameFigure {
+public class EnemyUFO extends GameFigure implements CollisionVistable {
     
     private BufferedImage image;
     public BufferedImage spriteImage;
@@ -110,11 +110,20 @@ public class EnemyUFO extends GameFigure {
             } else if (gameFigure instanceof Missile) {
                 health -= 5;
                 isHit = true;
+            } else if (gameFigure instanceof Spaceship) {
+                setState(new UFODieState());
+                isHit = true;
+                Main.gameData.spaceship.isHit = false;
             }
         }
         
         if (health <= 0) {
             setState(new UFODieState());
         }
+    }
+
+    @Override
+    public void accept(CollisionVisitor v) {
+        v.visit(this);
     }
 }

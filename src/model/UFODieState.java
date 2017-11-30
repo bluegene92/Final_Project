@@ -12,6 +12,7 @@ public class UFODieState implements State {
         ufo.x += 0.5;
         if (ufo.y > Main.WIN_HEIGHT + 20) {
             ufo.setState(new DoneState());
+            Main.gameData.scoreBoard.increaseScore();
         }
     }
 

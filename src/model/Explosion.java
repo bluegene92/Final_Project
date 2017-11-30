@@ -7,7 +7,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 public class Explosion extends GameFigure {
-    public BufferedImage image;
+    private BufferedImage image;
     private int width;
     private int height;
     public Explosion(float x, float y) {

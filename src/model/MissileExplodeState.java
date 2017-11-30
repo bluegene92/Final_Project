@@ -1,7 +1,5 @@
 package model;
-
 import controller.Main;
-
 public class MissileExplodeState implements State {
 
     @Override

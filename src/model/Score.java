@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package model;
-
 import controller.Main;
 import java.awt.Color;
 import java.awt.Font;
@@ -14,12 +7,14 @@ import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 public class Score {
-
-    public int score = 0;
+    private int score = 0;
+    private List<Observer> observers = new ArrayList<>();
     private BufferedImage image;
     public BufferedImage missileSprite;
     public static BufferedImage missile;
@@ -29,7 +24,7 @@ public class Score {
             missileSprite = resize(image.getSubimage(0, 0, 350, 80), 350/6, 80/6);
             missile = missileSprite;
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error: Cannot open missiles_sprite.png");
+            JOptionPane.showMessageDialog(null, "Error: Cannot open missiles.png");
             System.exit(-1);
         }        
     }
@@ -41,15 +36,22 @@ public class Score {
         if (missileSprite != null) {
             g.drawImage(missileSprite, 25, 55, null);
         } else {
-            for (int i = 0; i < GameData.spaceship.missileCharge; ++i) {
+            for (int i = 0; i < Main.gameData.spaceship.missileCharge; ++i) {
                 g.setColor(Color.CYAN);
                 g.fill(new Rectangle2D.Float(35 + (i*10), 55, 10, 5));
             }
         }
     }
     
-    public void update() {
-        
+    public void increaseScore() {
+        score++;
+        notifyAllObserver();
+    }
+    
+    public void notifyAllObserver() {
+        for (Observer ob : observers) {
+            ob.update(score);
+        }
     }
     
     public static BufferedImage resize(BufferedImage img, int newW, int newH) {
